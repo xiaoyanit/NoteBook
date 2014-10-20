@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>Id</key>
+		<integer>1</integer>
+		<key>createAt</key>
+		<string>8:22</string>
+		<key>mbtype</key>
+		<string>vip.png</string>
+		<key>profileImageUrl</key>
+		<string>touxiang1.png</string>
+		<key>source</key>
+		<string>Iphone 5s</string>
+		<key>text</key>
+		<string>The UIViewController in which I had implemented the preferredStatusBarStyle was used in a UITabBarController, which controlled the appearance of the views on the screen.</string>
+		<key>userName</key>
+		<string>tom_changt</string>
+	</dict>
+	<dict>
+		<key>Id</key>
+		<integer>2</integer>
+		<key>createAt</key>
+		<string>14:29</string>
+		<key>mbtype</key>
+		<string>vip.png</string>
+		<key>profileImageUrl</key>
+		<string>touxiang1.png</string>
+		<key>source</key>
+		<string>Iphone 4s</string>
+		<key>text</key>
+		<string>李克强9日抵达柏林开始访德。</string>
+		<key>userName</key>
+		<string>tom_changt</string>
+	</dict>
+	<dict>
+		<key>Id</key>
+		<integer>3</integer>
+		<key>createAt</key>
+		<string>16:10</string>
+		<key>mbtype</key>
+		<string>vip.png</string>
+		<key>profileImageUrl</key>
+		<string>touxiang1.png</string>
+		<key>source</key>
+		<string>Iphone 6</string>
+		<key>text</key>
+		<string>第一初始化控件；第二设置数据，重新设置控件frame。原因就是自定义Cell一般无法固定高度，很多时候高度需要随着内容改变。此外由于在单元格内部是无法控制单元格高度的，因此一般会定义一个高度属性用于在UITableView的代理事件中设置每个单元格高度</string>
+		<key>userName</key>
+		<string>tom_changt</string>
+	</dict>
+</array>
+</plist>
