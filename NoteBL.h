@@ -21,7 +21,6 @@
 //查询所用数据方法
 -(NSMutableArray*) findAll;
 
--(long long)findKey;
 
 -(NSMutableArray*) findAllCell;
 

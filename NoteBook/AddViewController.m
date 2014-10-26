@@ -60,7 +60,6 @@
     [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
     note.createAt= [dateFormatter stringFromDate:[NSDate date] ];
     note.text=self.content.text;
-    note.Id = [noteBL findKey]+1;
     note.profileImageUrl = @"touxiang1.png";
     note.userName = @"tom_changt";
     note.mbtype =@"vip.png";

@@ -23,9 +23,9 @@ static NoteDAO *sharedManager = nil;
         sharedManager = [[self alloc] init];
 //        NSString * path = [[NSBundle mainBundle]pathForResource:@"statusinfo" ofType:@"plist"];
 //        NSArray * array = [[NSArray alloc] initWithContentsOfFile:path];
-        sharedManager.notes = [[NSMutableArray alloc] init];
+        //sharedManager.notes = [[NSMutableArray alloc] init];
         sharedManager.notesCells = [[NSMutableArray alloc] init];
-        
+        [sharedManager createEditableCopyOfDatabaseIfNeeded];
 //        //类似递归数组操作
 //        [array enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
 //            [sharedManager.notes addObject:[Note statusWithDictionary:obj]];
@@ -38,82 +38,260 @@ static NoteDAO *sharedManager = nil;
     });
     return sharedManager;
 }
-
-//插入Note方法
--(int) create:(Note*)model
-{
-    BOOL flag=YES;
-     for (Note* note in self.notes) {
-         if ( note.id ==model.id){
-             flag=NO;
-             break;
-         }
-     }
-    if (flag) {
-        [self.notes addObject:model];
+- (void)createEditableCopyOfDatabaseIfNeeded {
+    
+    NSString *writableDBPath = [self applicationDocumentsDirectoryFile];
+    
+    if (sqlite3_open([writableDBPath UTF8String], &db)!=SQLITE_OK) {
+        sqlite3_close(db);
+        NSAssert(NO, @"数据库打开失败。");
+    }else{
+    
+        char *err;
+        NSString *createSQL=[NSString stringWithFormat:
+                             @"CREATE TABLE IF NOT EXISTS Note(id INTEGER PRIMARY KEY, profileImageUrl TEXT, userName TEXT,mbtype TEXT,createAt TEXT,source TEXT,text TEXT);"];
+        if (sqlite3_exec(db, [createSQL UTF8String],NULL, NULL, &err)!=SQLITE_OK) {
+            sqlite3_close(db);
+            NSAssert(NO, @"创建表失败，%s",err);
+        }
+        sqlite3_close(db);
+    
     }
     
-    return 0;
+    
 }
+
+- (NSString *)applicationDocumentsDirectoryFile {
+    NSString *documentDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+    NSString *path = [documentDirectory stringByAppendingPathComponent:DBFILE_NAME];
+    
+    return path;
+}
+
+//插入Note方法
+-(int) create:(Note*)model{
+    BOOL flag=YES;
+    
+    NSString *path=[self applicationDocumentsDirectoryFile];
+    
+    if (sqlite3_open([path UTF8String], &db)!=SQLITE_OK) {
+        sqlite3_close(db);
+        NSAssert(NO, @"打开数据库失败。");
+    }else{
+        NSString *qsql=@"INSERT OR REPLACE INTO Note ( profileImageUrl , userName ,mbtype ,createAt ,source ,text ) VALUES (?,?,?,?,?,?)";
+        sqlite3_stmt *statement;
+        //执行
+        if (sqlite3_prepare_v2(db, [qsql UTF8String], -1, &statement, NULL)==SQLITE_OK) {
+          
+            
+            sqlite3_bind_text(statement, 1, [model.profileImageUrl UTF8String], -1, NULL);
+            sqlite3_bind_text(statement, 2, [model.userName UTF8String], -1, NULL);
+            sqlite3_bind_text(statement, 3, [model.mbtype UTF8String], -1, NULL);
+            sqlite3_bind_text(statement, 4, [model.createAt UTF8String], -1, NULL);
+            sqlite3_bind_text(statement, 5, [model.source UTF8String], -1, NULL);
+            sqlite3_bind_text(statement, 6, [model.text UTF8String], -1, NULL);
+            
+            if (sqlite3_step(statement)!=SQLITE_DONE) {
+                NSAssert(NO, @"插入失败");
+                flag=NO;
+            }
+            
+        }
+        
+        sqlite3_finalize(statement);
+        sqlite3_close(db);
+    
+    }
+    
+    if (flag) {
+        return 1;
+    }else{
+        return 0;
+    }
+   }
 
 //删除Note方法
 -(int) remove:(Note*)model
 {
-    for (Note* note in self.notes) {
-        //比较主键是否相等
-        if ( note.id ==model.id){
-            [self.notes removeObject: note];
-            break;
-        }
-    }
+  BOOL flag=YES;
+   
+    NSString *path=[self applicationDocumentsDirectoryFile];
     
-    return 0;
+    if (sqlite3_open([path UTF8String], &db)!=SQLITE_OK) {
+        sqlite3_close(db);
+        NSAssert(NO, @"打开数据库失败。");
+    }else{
+        NSString *qsql=@"DELETE  from note where id =?";
+        sqlite3_stmt *statement;
+        //执行
+        if (sqlite3_prepare_v2(db, [qsql UTF8String], -1, &statement, NULL)==SQLITE_OK) {
+            
+            
+            sqlite3_bind_int(statement, 1, model.id);
+            
+            if (sqlite3_step(statement)!=SQLITE_DONE) {
+                NSAssert(NO, @"删除失败");
+                flag=NO;
+            }
+            
+        }
+        
+        sqlite3_finalize(statement);
+        sqlite3_close(db);
+        
+    }
+
+    
+    if (flag) {
+        return 1;
+    }else{
+        return 0;
+    }
 }
 
 //修改Note方法
--(int) modify:(Note*)model
-{
-    for (Note* note in self.notes) {
-        //比较日期主键是否相等
-        if (note.id ==model.id){
-            [self remove:note];
-            [self create:model];
-            break;
+-(int) modify:(Note*)model{
+    
+    BOOL flag=YES;
+    
+    NSString *path=[self applicationDocumentsDirectoryFile];
+    
+    if (sqlite3_open([path UTF8String], &db)!=SQLITE_OK) {
+        sqlite3_close(db);
+        NSAssert(NO, @"打开数据库失败。");
+    }else{
+        NSString *qsql=@"UPDATE note set  profileImageUrl=?，userName=?，mbtype=?，source=?，text=? where id =?";
+        sqlite3_stmt *statement;
+        //执行
+        if (sqlite3_prepare_v2(db, [qsql UTF8String], -1, &statement, NULL)==SQLITE_OK) {
+            
+            
+            sqlite3_bind_text(statement, 1, [model.profileImageUrl UTF8String], -1, NULL);
+            sqlite3_bind_text(statement, 2, [model.userName UTF8String], -1, NULL);
+            sqlite3_bind_text(statement, 3, [model.mbtype UTF8String], -1, NULL);
+             sqlite3_bind_text(statement, 4, [model.source UTF8String], -1, NULL);
+            sqlite3_bind_text(statement, 5, [model.text UTF8String], -1, NULL);
+            sqlite3_bind_int(statement, 6, model.id);
+            
+            if (sqlite3_step(statement)!=SQLITE_DONE) {
+                NSAssert(NO, @"修改失败");
+                flag=NO;
+            }
+            
         }
+        
+        sqlite3_finalize(statement);
+        sqlite3_close(db);
+        
     }
-    return 0;
+    
+    if (flag) {
+        return 1;
+    }else{
+        return 0;
+    }
 }
 
 //查询所有数据方法
--(NSMutableArray*) findAll
-{
-    return self.notes;
+-(NSMutableArray*) findAll{
+    NSString *path=[self applicationDocumentsDirectoryFile];
+    NSMutableArray *listData=[[NSMutableArray alloc] init];
+    if (sqlite3_open([path UTF8String], &db)!=SQLITE_OK) {
+        sqlite3_close(db);
+        NSAssert(NO, @"数据库打开失败");
+    }else{
+        NSString *qsql=@"SELECT id , profileImageUrl , userName ,mbtype ,createAt ,source ,text  from Note  ";
+        
+        sqlite3_stmt *statement;
+        if(sqlite3_prepare_v2(db, [qsql UTF8String], -1, &statement, NULL)==SQLITE_OK  ){
+            
+            while (sqlite3_step(statement)==SQLITE_ROW) {
+                long long id = (long long) sqlite3_column_int(statement, 0);
+                NSString *profileImageUrl=   [[NSString alloc] initWithUTF8String: (char *) sqlite3_column_text(statement, 1)];//头像
+                
+                NSString * userName=   [[NSString alloc] initWithUTF8String: (char *) sqlite3_column_text(statement, 2)];//发送用户
+                
+                NSString * mbtype=   [[NSString alloc] initWithUTF8String: (char *) sqlite3_column_text(statement, 3)];//会员类型
+                
+                NSString * createAt=   [[NSString alloc] initWithUTF8String: (char *) sqlite3_column_text(statement, 4)];//创建日期
+                
+                NSString * source=   [[NSString alloc] initWithUTF8String: (char *) sqlite3_column_text(statement, 5)];//设备来源
+                
+                NSString * text=   [[NSString alloc] initWithUTF8String: (char *) sqlite3_column_text(statement, 6)];//微博内容
+                
+                Note *returnNote=[[Note alloc] init];
+                returnNote.id=id;
+                returnNote.profileImageUrl=profileImageUrl;
+                returnNote.userName=userName;
+                returnNote.mbtype=mbtype;
+                returnNote.createAt=createAt;
+                returnNote.source=source;
+                returnNote.text=text;
+                
+                [listData addObject:returnNote];
+                [self.notesCells addObject: [[NoteCellTableViewCell alloc] init]];
+            }
+            
+        }
+        sqlite3_finalize(statement);
+        sqlite3_close(db);
+    
+    }
+    
+    return listData;
 }
 
 //按照主键查询数据方法
--(Note*) findById:(Note*)model
-{
-    for (Note* note in self.notes) {
-        //比较日期主键是否相等
-        if (note.id ==model.id){
-            return note;
+-(Note*) findById:(Note*)model{
+    Note *returnNote=nil;
+    NSString *path=[self applicationDocumentsDirectoryFile];
+    
+    if (sqlite3_open([path UTF8String], &db)!=SQLITE_OK) {
+        sqlite3_close(db);
+        NSAssert(NO, @"打开数据看失败!");
+    }else{
+        NSString *qsql=@"SELECT id , profileImageUrl , userName ,mbtype ,createAt ,source ,text  from Note where id =?";
+        sqlite3_stmt *statement;
+        //预处理过程
+        if (sqlite3_prepare_v2(db, [qsql UTF8String], -1, &statement, NULL)==SQLITE_OK) {
+            //绑定参数
+            sqlite3_bind_int(statement, 1, model.id);
+            //执行sql
+            if (sqlite3_step(statement)==SQLITE_ROW) {
+                long long id = (long long) sqlite3_column_int(statement, 0);
+                NSString *profileImageUrl=   [[NSString alloc] initWithUTF8String: (char *) sqlite3_column_text(statement, 1)];//头像
+                
+               NSString * userName=   [[NSString alloc] initWithUTF8String: (char *) sqlite3_column_text(statement, 2)];//发送用户
+                
+                NSString * mbtype=   [[NSString alloc] initWithUTF8String: (char *) sqlite3_column_text(statement, 3)];//会员类型
+                
+                NSString * createAt=   [[NSString alloc] initWithUTF8String: (char *) sqlite3_column_text(statement, 4)];//创建日期
+                
+                 NSString * source=   [[NSString alloc] initWithUTF8String: (char *) sqlite3_column_text(statement, 5)];//设备来源
+                
+                 NSString * text=   [[NSString alloc] initWithUTF8String: (char *) sqlite3_column_text(statement, 6)];//微博内容
+                
+                Note *returnNote=[[Note alloc] init];
+                returnNote.id=id;
+                returnNote.profileImageUrl=profileImageUrl;
+                returnNote.userName=userName;
+                returnNote.mbtype=mbtype;
+                returnNote.createAt=createAt;
+                returnNote.source=source;
+                returnNote.text=text;
+             
+                
+                
+            }
         }
+        sqlite3_finalize(statement);
+        sqlite3_close(db);
+    
     }
-    return nil;
+    return returnNote;
 }
 
-//获得主键的方法
--(long long )findKey{
-    
-    long long noteId=0;
-    for(Note * note in self.notes){
-        if (note.id>noteId) {
-            noteId=note.id;
-        }
-    }
-    return  noteId;
-    
-}
+
 
 -(NSMutableArray*) findAllCell{
     return self.notesCells;
@@ -129,6 +307,13 @@ static NoteDAO *sharedManager = nil;
 {
     [self.notesCells removeObject:modelCell];
     return 0;
+}
+
+-(NSString *)getNowDate{
+    NSDateFormatter *dateFormatter=[[NSDateFormatter alloc] init];
+    [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
+    NSString *createAt=[dateFormatter stringFromDate:[NSDate date] ];
+    return createAt;
 }
 
 @end

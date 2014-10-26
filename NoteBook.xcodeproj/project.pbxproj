@@ -33,6 +33,7 @@
 		CFD9F92819F00DFD0090F3DA /* touxiang5.png in Resources */ = {isa = PBXBuildFile; fileRef = CFD9F92019F00DFD0090F3DA /* touxiang5.png */; };
 		CFD9F92919F00DFD0090F3DA /* vip.png in Resources */ = {isa = PBXBuildFile; fileRef = CFD9F92119F00DFD0090F3DA /* vip.png */; };
 		CFD9F92A19F00DFD0090F3DA /* vip1.png in Resources */ = {isa = PBXBuildFile; fileRef = CFD9F92219F00DFD0090F3DA /* vip1.png */; };
+		CFF59F9219FB706B002026DC /* libsqlite3.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = CFF59F9119FB706B002026DC /* libsqlite3.0.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -82,6 +83,7 @@
 		CFD9F92019F00DFD0090F3DA /* touxiang5.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = touxiang5.png; sourceTree = "<group>"; };
 		CFD9F92119F00DFD0090F3DA /* vip.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = vip.png; sourceTree = "<group>"; };
 		CFD9F92219F00DFD0090F3DA /* vip1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = vip1.png; sourceTree = "<group>"; };
+		CFF59F9119FB706B002026DC /* libsqlite3.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libsqlite3.0.dylib; path = usr/lib/libsqlite3.0.dylib; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -89,6 +91,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CFF59F9219FB706B002026DC /* libsqlite3.0.dylib in Frameworks */,
 				CFAE4E4C19ED5F2B00AB9735 /* CoreGraphics.framework in Frameworks */,
 				CFAE4E4E19ED5F2B00AB9735 /* UIKit.framework in Frameworks */,
 				CFAE4E4A19ED5F2B00AB9735 /* Foundation.framework in Frameworks */,
@@ -132,6 +135,7 @@
 		CFAE4E4819ED5F2B00AB9735 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CFF59F9119FB706B002026DC /* libsqlite3.0.dylib */,
 				CFAE4E4919ED5F2B00AB9735 /* Foundation.framework */,
 				CFAE4E4B19ED5F2B00AB9735 /* CoreGraphics.framework */,
 				CFAE4E4D19ED5F2B00AB9735 /* UIKit.framework */,

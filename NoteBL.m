@@ -35,11 +35,7 @@
     return [dao findAll];
 }
 
-//获得主键的方法
--(long long)findKey{
-    NoteDAO *dao = [NoteDAO sharedManager];
-    return [dao findKey];
-}
+
 
 -(NSMutableArray*) findAllCell{
     NoteDAO *dao = [NoteDAO sharedManager];
