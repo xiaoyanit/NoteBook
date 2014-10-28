@@ -29,4 +29,6 @@
 
 //删除Note方法
 -(NSMutableArray*) removeCell:(NoteCellTableViewCell*)modelCell;
+
+-(long long)getNoteID;
 @end

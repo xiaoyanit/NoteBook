@@ -25,7 +25,8 @@ static NoteDAO *sharedManager = nil;
 //        NSArray * array = [[NSArray alloc] initWithContentsOfFile:path];
         //sharedManager.notes = [[NSMutableArray alloc] init];
         sharedManager.notesCells = [[NSMutableArray alloc] init];
-        [sharedManager createEditableCopyOfDatabaseIfNeeded];
+        [sharedManager managedObjectContext];
+       // [sharedManager createEditableCopyOfDatabaseIfNeeded];
 //        //类似递归数组操作
 //        [array enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
 //            [sharedManager.notes addObject:[Note statusWithDictionary:obj]];
@@ -38,41 +39,41 @@ static NoteDAO *sharedManager = nil;
     });
     return sharedManager;
 }
-- (void)createEditableCopyOfDatabaseIfNeeded {
-    
-    NSString *writableDBPath = [self applicationDocumentsDirectoryFile];
-    
-    if (sqlite3_open([writableDBPath UTF8String], &db)!=SQLITE_OK) {
-        sqlite3_close(db);
-        NSAssert(NO, @"数据库打开失败。");
-    }else{
-    
-        char *err;
-        NSString *createSQL=[NSString stringWithFormat:
-                             @"CREATE TABLE IF NOT EXISTS Note(id INTEGER PRIMARY KEY, profileImageUrl TEXT, userName TEXT,mbtype TEXT,createAt TEXT,source TEXT,text TEXT);"];
-        if (sqlite3_exec(db, [createSQL UTF8String],NULL, NULL, &err)!=SQLITE_OK) {
-            sqlite3_close(db);
-            NSAssert(NO, @"创建表失败，%s",err);
-        }
-        sqlite3_close(db);
-    
-    }
-    
-    
-}
-
-- (NSString *)applicationDocumentsDirectoryFile {
-    NSString *documentDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
-    NSString *path = [documentDirectory stringByAppendingPathComponent:DBFILE_NAME];
-    
-    return path;
-}
+/*- (void)createEditableCopyOfDatabaseIfNeeded {
+//    
+//    NSString *writableDBPath = [self applicationDocumentsDirectoryFile];
+//    
+//    if (sqlite3_open([writableDBPath UTF8String], &db)!=SQLITE_OK) {
+//        sqlite3_close(db);
+//        NSAssert(NO, @"数据库打开失败。");
+//    }else{
+//    
+//        char *err;
+//        NSString *createSQL=[NSString stringWithFormat:
+//                             @"CREATE TABLE IF NOT EXISTS Note(id INTEGER PRIMARY KEY, profileImageUrl TEXT, userName TEXT,mbtype TEXT,createAt TEXT,source TEXT,text TEXT);"];
+//        if (sqlite3_exec(db, [createSQL UTF8String],NULL, NULL, &err)!=SQLITE_OK) {
+//            sqlite3_close(db);
+//            NSAssert(NO, @"创建表失败，%s",err);
+//        }
+//        sqlite3_close(db);
+//    
+//    }
+//    
+//    
+//}
+//
+//- (NSString *)applicationDocumentsDirectoryFile {
+//    NSString *documentDirectory = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) lastObject];
+//    NSString *path = [documentDirectory stringByAppendingPathComponent:DBFILE_NAME];
+//    
+//    return path;
+//}*/
 
 //插入Note方法
 -(int) create:(Note*)model{
     BOOL flag=YES;
     
-    NSString *path=[self applicationDocumentsDirectoryFile];
+  /*  NSString *path=[self applicationDocumentsDirectoryFile];
     
     if (sqlite3_open([path UTF8String], &db)!=SQLITE_OK) {
         sqlite3_close(db);
@@ -101,8 +102,24 @@ static NoteDAO *sharedManager = nil;
         sqlite3_finalize(statement);
         sqlite3_close(db);
     
-    }
+    }*/
+    NSManagedObjectContext *cxt=[self managedObjectContext];
+    NSManagedObject *mo=[NSEntityDescription insertNewObjectForEntityForName:@"MyNote" inManagedObjectContext:cxt];
+    [mo setValue:model.profileImageUrl forKey:@"profileImageUrl"];
+    [mo setValue:model.userName forKey:@"userName"];
+    [mo setValue:model.mbtype forKey:@"mbtype"];
+    [mo setValue:model.createAt forKey:@"createAt"];
+    [mo setValue:model.source forKey:@"source"];
+    [mo setValue:model.text forKey:@"text"];
+    [mo setValue:[NSNumber numberWithLongLong:model.id ] forKey:@"id"];
     
+    NSError *savingError = nil;
+    if ([cxt save:&savingError]) {
+        NSLog(@"插入数据成功！");
+    }else{
+        NSLog(@"插入数据失败");
+        flag=NO;
+    }
     if (flag) {
         return 1;
     }else{
@@ -114,8 +131,34 @@ static NoteDAO *sharedManager = nil;
 -(int) remove:(Note*)model
 {
   BOOL flag=YES;
-   
-    NSString *path=[self applicationDocumentsDirectoryFile];
+    NSManagedObjectContext *cxt=[self managedObjectContext];
+    NSEntityDescription *entityDescription=[NSEntityDescription entityForName:@"MyNote" inManagedObjectContext:cxt];
+    
+    NSFetchRequest *request=[[NSFetchRequest alloc ]init];
+    [request setEntity:entityDescription];
+    
+    NSPredicate *predicate=[NSPredicate predicateWithFormat:@"id = %lld",model.id];
+    [request setPredicate:predicate];
+    
+    NSError *error = nil;
+    NSArray *listData = [cxt executeFetchRequest:request error:&error];
+    if ([listData count] > 0) {
+        NoteManagedObject *note = [listData lastObject];
+        [cxt  deleteObject:note];
+        
+        NSError *savingError = nil;
+        if ([cxt save:&savingError]){
+            NSLog(@"删除数据成功");
+        } else {
+            NSLog(@"删除数据失败");
+            flag=NO;
+        }
+    }else{
+        NSLog(@"数据没有找到，删除失败。");
+        flag=NO;
+    }
+
+   /* NSString *path=[self applicationDocumentsDirectoryFile];
     
     if (sqlite3_open([path UTF8String], &db)!=SQLITE_OK) {
         sqlite3_close(db);
@@ -139,9 +182,7 @@ static NoteDAO *sharedManager = nil;
         sqlite3_finalize(statement);
         sqlite3_close(db);
         
-    }
-
-    
+    }*/
     if (flag) {
         return 1;
     }else{
@@ -154,7 +195,7 @@ static NoteDAO *sharedManager = nil;
     
     BOOL flag=YES;
     
-    NSString *path=[self applicationDocumentsDirectoryFile];
+  /*  NSString *path=[self applicationDocumentsDirectoryFile];
     
     if (sqlite3_open([path UTF8String], &db)!=SQLITE_OK) {
         sqlite3_close(db);
@@ -183,6 +224,37 @@ static NoteDAO *sharedManager = nil;
         sqlite3_finalize(statement);
         sqlite3_close(db);
         
+    }*/
+    NSManagedObjectContext *cxt=[self managedObjectContext];
+    NSEntityDescription *entityDescription=[NSEntityDescription entityForName:@"MyNote" inManagedObjectContext:cxt];
+    
+    NSFetchRequest *request=[[NSFetchRequest alloc ]init];
+    [request setEntity:entityDescription];
+    
+    NSPredicate *predicate=[NSPredicate predicateWithFormat:@"id = %lld",model.id];
+    [request setPredicate:predicate];
+    
+    NSError *error = nil;
+    NSArray *listData = [cxt executeFetchRequest:request error:&error];
+    if ([listData count] > 0) {
+        NoteManagedObject *note = [listData lastObject];
+       
+        note.profileImageUrl=model.profileImageUrl;
+           note.userName=model.userName;
+           note.mbtype=model.mbtype;
+           note.source=model.source;
+           note.text=model.text;
+
+        NSError *savingError = nil;
+        if ([cxt save:&savingError]){
+            NSLog(@"修改数据成功");
+        } else {
+            NSLog(@"修改数据失败");
+            flag=NO;
+        }
+    }else{
+        NSLog(@"数据没有找到，修改失败。");
+        flag=NO;
     }
     
     if (flag) {
@@ -194,9 +266,9 @@ static NoteDAO *sharedManager = nil;
 
 //查询所有数据方法
 -(NSMutableArray*) findAll{
-    NSString *path=[self applicationDocumentsDirectoryFile];
+    //NSString *path=[self applicationDocumentsDirectoryFile];
     NSMutableArray *listData=[[NSMutableArray alloc] init];
-    if (sqlite3_open([path UTF8String], &db)!=SQLITE_OK) {
+    /*if (sqlite3_open([path UTF8String], &db)!=SQLITE_OK) {
         sqlite3_close(db);
         NSAssert(NO, @"数据库打开失败");
     }else{
@@ -236,6 +308,32 @@ static NoteDAO *sharedManager = nil;
         sqlite3_finalize(statement);
         sqlite3_close(db);
     
+    }*/
+    
+    NSManagedObjectContext *cxt=[self managedObjectContext];
+    NSEntityDescription *entityDescription=[NSEntityDescription entityForName:@"MyNote" inManagedObjectContext:cxt];
+    
+    NSFetchRequest *request=[[NSFetchRequest alloc] init];
+    [request setEntity:entityDescription];
+    
+    //设置排序
+    NSSortDescriptor *sortDescriptor=[[NSSortDescriptor alloc] initWithKey:@"id" ascending:YES];
+    [request setSortDescriptors:@[sortDescriptor]];
+    
+    NSError *error=nil;
+    NSArray *searchDate=[cxt executeFetchRequest:request error:&error];
+    
+    for(NoteManagedObject *mo in searchDate){
+        Note *returnNote=[[Note alloc] init];
+        returnNote.id=[mo.id longLongValue];
+        returnNote.profileImageUrl=mo.profileImageUrl;
+        returnNote.userName=mo.userName;
+        returnNote.mbtype=mo.mbtype;
+        returnNote.createAt=mo.createAt;
+        returnNote.source=mo.source;
+        returnNote.text=mo.text;
+        [listData addObject:returnNote];
+         [self.notesCells addObject: [[NoteCellTableViewCell alloc] init]];
     }
     
     return listData;
@@ -244,7 +342,7 @@ static NoteDAO *sharedManager = nil;
 //按照主键查询数据方法
 -(Note*) findById:(Note*)model{
     Note *returnNote=nil;
-    NSString *path=[self applicationDocumentsDirectoryFile];
+    /*NSString *path=[self applicationDocumentsDirectoryFile];
     
     if (sqlite3_open([path UTF8String], &db)!=SQLITE_OK) {
         sqlite3_close(db);
@@ -287,7 +385,31 @@ static NoteDAO *sharedManager = nil;
         sqlite3_finalize(statement);
         sqlite3_close(db);
     
+    }*/
+    
+    NSManagedObjectContext *cxt=[self managedObjectContext];
+    NSEntityDescription *entityDescription=[NSEntityDescription entityForName:@"MyNote" inManagedObjectContext:cxt];
+    NSFetchRequest *request=[[NSFetchRequest alloc]init];
+    [request setEntity:entityDescription];
+    
+    NSPredicate *predicate=[NSPredicate predicateWithFormat:@"id = %lld",model.id];
+    [request setPredicate:predicate];
+    
+    NSError *error=nil;
+    NSArray *resultArray=[cxt executeFetchRequest:request error:&error];
+    
+    if ([resultArray count]>0) {
+        NoteManagedObject *mo =[resultArray lastObject];
+        returnNote=[[Note alloc]init];
+        returnNote.id=[mo.id longLongValue];
+        returnNote.profileImageUrl=mo.profileImageUrl;
+        returnNote.userName=mo.userName;
+        returnNote.mbtype=mo.mbtype;
+        returnNote.createAt=mo.createAt;
+        returnNote.source=mo.source;
+        returnNote.text=mo.text;
     }
+    
     return returnNote;
 }
 
@@ -314,6 +436,29 @@ static NoteDAO *sharedManager = nil;
     [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
     NSString *createAt=[dateFormatter stringFromDate:[NSDate date] ];
     return createAt;
+}
+-(long long)getNoteID{
+    long long result=0;
+    NSManagedObjectContext *cxt=[self managedObjectContext];
+    NSEntityDescription *entityDescription=[NSEntityDescription entityForName:@"MyNote" inManagedObjectContext:cxt];
+    
+    NSFetchRequest *request=[[NSFetchRequest alloc] init];
+    [request setEntity:entityDescription];
+    
+    //设置排序
+    NSSortDescriptor *sortDescriptor=[[NSSortDescriptor alloc] initWithKey:@"id" ascending:YES];
+    [request setSortDescriptors:@[sortDescriptor]];
+    
+    NSError *error=nil;
+    NSArray *searchDate=[cxt executeFetchRequest:request error:&error];
+    
+    if ([searchDate count]>0) {
+        NoteManagedObject *mo =[searchDate lastObject];
+        result=[mo.id longLongValue];
+    }
+    
+    return result;
+    
 }
 
 @end

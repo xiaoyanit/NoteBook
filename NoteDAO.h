@@ -10,19 +10,21 @@
 #import "Note.h"
 #import "NoteCellTableViewCell.h"
 #import <sqlite3.h>
+#import "CoreDataDAO.h"
+#import "NoteManagedObject.h"
 
-#define  DBFILE_NAME @"NotesList.sqllite3"
-@interface NoteDAO : NSObject{
-    sqlite3 *db;
-}
-
+//#define  DBFILE_NAME @"NotesList.sqllite3"
+//@interface NoteDAO : CoreDataDAO{
+//    sqlite3 *db;
+//}
+@interface NoteDAO : CoreDataDAO;
 //保存数据列表
 @property (nonatomic,strong) NSMutableArray* notesCells;
 
 + (NoteDAO*)sharedManager;
 
-- (NSString *)applicationDocumentsDirectoryFile;
-- (void)createEditableCopyOfDatabaseIfNeeded;
+//- (NSString *)applicationDocumentsDirectoryFile;
+//- (void)createEditableCopyOfDatabaseIfNeeded;
 
 //插入Note方法
 -(int) create:(Note*)model;
@@ -44,10 +46,8 @@
 //按照主键查询数据方法
 -(Note*) findById:(Note*)model;
 
-
-
-
 -(NSString *)getNowDate;
+-(long long)getNoteID;
 
 @end
 

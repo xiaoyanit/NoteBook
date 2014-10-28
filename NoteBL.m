@@ -57,4 +57,8 @@
     return [dao findAllCell];
 }
 
+-(long long)getNoteID{
+ NoteDAO *dao = [NoteDAO sharedManager];
+    return [dao getNoteID];
+}
 @end

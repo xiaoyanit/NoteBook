@@ -8,6 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		CF5F2C9A19EFFA5D001E9B8E /* NoteCellTableViewCell.m in Sources */ = {isa = PBXBuildFile; fileRef = CF5F2C9919EFFA5D001E9B8E /* NoteCellTableViewCell.m */; };
+		CFA11A2E19FCD32C00F5BCA0 /* CoreDataNotes.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = CFA11A2C19FCD32C00F5BCA0 /* CoreDataNotes.xcdatamodeld */; };
+		CFA11A3119FCD6FA00F5BCA0 /* NoteManagedObject.m in Sources */ = {isa = PBXBuildFile; fileRef = CFA11A3019FCD6FA00F5BCA0 /* NoteManagedObject.m */; };
+		CFA11A3619FCDA5C00F5BCA0 /* CoreDataDAO.m in Sources */ = {isa = PBXBuildFile; fileRef = CFA11A3519FCDA5C00F5BCA0 /* CoreDataDAO.m */; };
 		CFAE4E4A19ED5F2B00AB9735 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CFAE4E4919ED5F2B00AB9735 /* Foundation.framework */; };
 		CFAE4E4C19ED5F2B00AB9735 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CFAE4E4B19ED5F2B00AB9735 /* CoreGraphics.framework */; };
 		CFAE4E4E19ED5F2B00AB9735 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CFAE4E4D19ED5F2B00AB9735 /* UIKit.framework */; };
@@ -49,6 +52,11 @@
 /* Begin PBXFileReference section */
 		CF5F2C9819EFFA5D001E9B8E /* NoteCellTableViewCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NoteCellTableViewCell.h; sourceTree = "<group>"; };
 		CF5F2C9919EFFA5D001E9B8E /* NoteCellTableViewCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NoteCellTableViewCell.m; sourceTree = "<group>"; };
+		CFA11A2D19FCD32C00F5BCA0 /* CoreDataNotes.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreDataNotes.xcdatamodel; sourceTree = "<group>"; };
+		CFA11A2F19FCD6FA00F5BCA0 /* NoteManagedObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NoteManagedObject.h; sourceTree = "<group>"; };
+		CFA11A3019FCD6FA00F5BCA0 /* NoteManagedObject.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = NoteManagedObject.m; sourceTree = "<group>"; };
+		CFA11A3419FCDA5C00F5BCA0 /* CoreDataDAO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CoreDataDAO.h; sourceTree = "<group>"; };
+		CFA11A3519FCDA5C00F5BCA0 /* CoreDataDAO.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CoreDataDAO.m; sourceTree = "<group>"; };
 		CFAE4E4619ED5F2B00AB9735 /* NoteBook.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NoteBook.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CFAE4E4919ED5F2B00AB9735 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
 		CFAE4E4B19ED5F2B00AB9735 /* CoreGraphics.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreGraphics.framework; path = System/Library/Frameworks/CoreGraphics.framework; sourceTree = SDKROOT; };
@@ -135,6 +143,7 @@
 		CFAE4E4819ED5F2B00AB9735 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CFA11A2C19FCD32C00F5BCA0 /* CoreDataNotes.xcdatamodeld */,
 				CFF59F9119FB706B002026DC /* libsqlite3.0.dylib */,
 				CFAE4E4919ED5F2B00AB9735 /* Foundation.framework */,
 				CFAE4E4B19ED5F2B00AB9735 /* CoreGraphics.framework */,
@@ -197,6 +206,8 @@
 		CFAE4E7A19ED5F9F00AB9735 /* dao */ = {
 			isa = PBXGroup;
 			children = (
+				CFA11A3419FCDA5C00F5BCA0 /* CoreDataDAO.h */,
+				CFA11A3519FCDA5C00F5BCA0 /* CoreDataDAO.m */,
 				CFAE4E8219ED606700AB9735 /* NoteDAO.h */,
 				CFAE4E8319ED606700AB9735 /* NoteDAO.m */,
 			);
@@ -206,6 +217,8 @@
 		CFAE4E7B19ED5FF000AB9735 /* domain */ = {
 			isa = PBXGroup;
 			children = (
+				CFA11A2F19FCD6FA00F5BCA0 /* NoteManagedObject.h */,
+				CFA11A3019FCD6FA00F5BCA0 /* NoteManagedObject.m */,
 				CFAE4E7F19ED605300AB9735 /* Note.h */,
 				CFAE4E8019ED605300AB9735 /* Note.m */,
 			);
@@ -337,7 +350,10 @@
 				CFAE4E8419ED606700AB9735 /* NoteDAO.m in Sources */,
 				CFAE4E8119ED605300AB9735 /* Note.m in Sources */,
 				CF5F2C9A19EFFA5D001E9B8E /* NoteCellTableViewCell.m in Sources */,
+				CFA11A3619FCDA5C00F5BCA0 /* CoreDataDAO.m in Sources */,
+				CFA11A3119FCD6FA00F5BCA0 /* NoteManagedObject.m in Sources */,
 				CFAE4E8F19ED70BD00AB9735 /* DetailViewController.m in Sources */,
+				CFA11A2E19FCD32C00F5BCA0 /* CoreDataNotes.xcdatamodeld in Sources */,
 				CFAE4E9219ED829A00AB9735 /* NoteBL.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -540,6 +556,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		CFA11A2C19FCD32C00F5BCA0 /* CoreDataNotes.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				CFA11A2D19FCD32C00F5BCA0 /* CoreDataNotes.xcdatamodel */,
+			);
+			currentVersion = CFA11A2D19FCD32C00F5BCA0 /* CoreDataNotes.xcdatamodel */;
+			path = CoreDataNotes.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = CFAE4E3E19ED5F2B00AB9735 /* Project object */;
 }

@@ -59,6 +59,7 @@
     NSDateFormatter *dateFormatter=[[NSDateFormatter alloc] init];
     [dateFormatter setDateFormat:@"yyyy-MM-dd HH:mm:ss"];
     note.createAt= [dateFormatter stringFromDate:[NSDate date] ];
+    note.id=[noteBL getNoteID]+1;
     note.text=self.content.text;
     note.profileImageUrl = @"touxiang1.png";
     note.userName = @"tom_changt";
